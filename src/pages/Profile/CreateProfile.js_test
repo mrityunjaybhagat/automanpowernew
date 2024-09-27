@@ -1,0 +1,45 @@
+import React, { useState, useEffect } from 'react';
+import { getUserData } from '../../services/profileServices';
+
+const CreateProfile = () => {
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const userId = localStorage.getItem('login_token');
+
+  useEffect(() => {
+    if (userId) {
+      setLoading(true);
+      getUserData(userId)
+        .then((response) => {
+          setUserData(response.data?.user_data[0] || {}); // Get first user data entry
+          setLoading(false);
+        })
+        .catch((err) => {
+          setError("Failed to fetch user data");
+          setLoading(false);
+        });
+    }
+  }, [userId]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  return (
+    <div>
+      <h2>Create Your Profile</h2>
+      {/* Example: Show user data (add more fields as needed) */}
+      <p>Name: {userData?.name || ''}</p>
+      <p>Email: {userData?.email || ''}</p>
+      {/* Add your form inputs here */}
+    </div>
+  );
+};
+
+export default CreateProfile;
